@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Video Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #333;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: #000;
+            border: 2px solid #fff;
+            border-radius: 8px;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .status {
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Local Video Stream Test</h1>
+        <p>This tests your camera and microphone directly.</p>
+        
+        <div>
+            <button onclick="startVideo()">Start Video</button>
+            <button onclick="startAudio()">Start Audio Only</button>
+            <button onclick="stopStream()">Stop Stream</button>
+            <button onclick="testPermissions()">Test Permissions</button>
+        </div>
+        
+        <video id="localVideo" autoplay muted playsinline></video>
+        
+        <div class="status" id="status">
+            <div class="info">Click "Start Video" to test your camera</div>
+        </div>
+    </div>
+
+    <script>
+        let localStream = null;
+        const video = document.getElementById('localVideo');
+        const status = document.getElementById('status');
+        
+        function log(message, type = 'info') {
+            console.log(`[Local Video Test] ${message}`);
+            status.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+        
+        async function startVideo() {
+            try {
+                log('🎥 Requesting video access...', 'info');
+                
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                log(`✅ Got media stream: ${localStream.getVideoTracks().length} video, ${localStream.getAudioTracks().length} audio`, 'success');
+                
+                // Set video source
+                video.srcObject = localStream;
+                
+                // Log video properties
+                video.onloadedmetadata = () => {
+                    log(`📐 Video dimensions: ${video.videoWidth} x ${video.videoHeight}`, 'info');
+                };
+                
+                video.onplay = () => {
+                    log('▶️ Video playing successfully!', 'success');
+                };
+                
+                video.onerror = (e) => {
+                    log(`❌ Video error: ${e.message}`, 'error');
+                };
+                
+                // Force play
+                await video.play();
+                
+            } catch (error) {
+                log(`❌ Failed to get video: ${error.name} - ${error.message}`, 'error');
+                
+                if (error.name === 'NotAllowedError') {
+                    log('⚠️ Camera permission denied. Please allow camera access.', 'error');
+                } else if (error.name === 'NotFoundError') {
+                    log('⚠️ No camera found.', 'error');
+                } else if (error.name === 'NotReadableError') {
+                    log('⚠️ Camera is already in use by another application.', 'error');
+                }
+            }
+        }
+        
+        async function startAudio() {
+            try {
+                log('🎤 Requesting audio access...', 'info');
+                
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: false,
+                    audio: true
+                });
+                
+                log(`✅ Got audio stream: ${localStream.getAudioTracks().length} audio tracks`, 'success');
+                
+            } catch (error) {
+                log(`❌ Failed to get audio: ${error.name} - ${error.message}`, 'error');
+            }
+        }
+        
+        function stopStream() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                    log(`🛑 Stopped ${track.kind} track`, 'info');
+                });
+                localStream = null;
+                video.srcObject = null;
+                log('✅ Stream stopped', 'success');
+            } else {
+                log('⚠️ No active stream to stop', 'info');
+            }
+        }
+        
+        async function testPermissions() {
+            try {
+                log('🔍 Testing permissions...', 'info');
+                
+                // Check if getUserMedia is supported
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    log('❌ getUserMedia not supported in this browser', 'error');
+                    return;
+                }
+                
+                log('✅ getUserMedia is supported', 'success');
+                
+                // Check permissions API if available
+                if (navigator.permissions) {
+                    const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+                    const micPermission = await navigator.permissions.query({ name: 'microphone' });
+                    
+                    log(`📷 Camera permission: ${cameraPermission.state}`, cameraPermission.state === 'granted' ? 'success' : 'info');
+                    log(`🎤 Microphone permission: ${micPermission.state}`, micPermission.state === 'granted' ? 'success' : 'info');
+                }
+                
+                // List available devices
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                const audioDevices = devices.filter(d => d.kind === 'audioinput');
+                
+                log(`📱 Found ${videoDevices.length} video devices and ${audioDevices.length} audio devices`, 'info');
+                
+                videoDevices.forEach((device, i) => {
+                    log(`📹 Video ${i+1}: ${device.label || 'Unknown Camera'}`, 'info');
+                });
+                
+                audioDevices.forEach((device, i) => {
+                    log(`🎤 Audio ${i+1}: ${device.label || 'Unknown Microphone'}`, 'info');
+                });
+                
+            } catch (error) {
+                log(`❌ Permission test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test on page load
+        window.addEventListener('load', () => {
+            log('🚀 Local Video Test Ready', 'success');
+            testPermissions();
+        });
+    </script>
+</body>
+</html>

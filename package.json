@@ -1,0 +1,53 @@
+{
+  "name": "web-chat-by-ankit",
+  "version": "1.0.0",
+  "description": "Modern web chat application with video calling and advanced features",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install-client": "cd client && npm install",
+    "setup": "npm install && cd client && npm install",
+    "start-all": "concurrently \"npm start\" \"npm run client\"",
+    "dev-all": "concurrently \"npm run dev\" \"npm run client\" --names \"SERVER,CLIENT\" --prefix-colors \"blue,green\" --kill-others-on-fail",
+    "live": "concurrently \"npm run dev\" \"npm run client\" --names \"🚀SERVER,⚡CLIENT\" --prefix-colors \"blue,green\" --kill-others-on-fail",
+    "seed": "node seeds/seedData.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.10.0",
+    "express-session": "^1.18.2",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.43",
+    "mongoose": "^7.5.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.4",
+    "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.8.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "chat",
+    "video-call",
+    "audio-call",
+    "real-time",
+    "webrtc"
+  ],
+  "author": "Ankit",
+  "license": "MIT"
+}

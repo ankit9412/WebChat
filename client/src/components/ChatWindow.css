@@ -1,0 +1,103 @@
+/* Animation for gradient shift in sendbox */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Pulse animation for recording button */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.6);
+  }
+  100% {
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+  }
+}
+
+/* Typing dots animation */
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.typing-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #9ca3af;
+  animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Message status tick animations */
+@keyframes tickAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.message-status-tick {
+  animation: tickAppear 0.3s ease-out;
+}
+
+/* Button hover glow effects */
+@keyframes buttonGlow {
+  0% {
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(37, 211, 102, 0.6);
+  }
+  100% {
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+  }
+}
+
+/* Input field focus glow */
+@keyframes inputGlow {
+  0% {
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25), 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  50% {
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.35), 0 0 0 4px rgba(102, 126, 234, 0.15);
+  }
+  100% {
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25), 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+}

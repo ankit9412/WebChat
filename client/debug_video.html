@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Video Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .video-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        video {
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #000;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .logs {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            height: 200px;
+            overflow-y: scroll;
+            font-family: monospace;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebRTC Video Stream Test</h1>
+    
+    <button onclick="startLocalVideo()">Start Local Video</button>
+    <button onclick="stopLocalVideo()">Stop Local Video</button>
+    
+    <div class="video-container">
+        <div>
+            <h3>Local Video</h3>
+            <video id="localVideo" width="320" height="240" autoplay muted></video>
+        </div>
+        <div>
+            <h3>Remote Video (Simulated)</h3>
+            <video id="remoteVideo" width="320" height="240" autoplay></video>
+        </div>
+    </div>
+    
+    <div class="logs" id="logs"></div>
+    
+    <script>
+        let localStream = null;
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const logs = document.getElementById('logs');
+        
+        function log(message) {
+            console.log(message);
+            logs.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        async function startLocalVideo() {
+            try {
+                log('🎥 Requesting user media...');
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                log('✅ Got local stream with tracks:');
+                log(`  - Video tracks: ${localStream.getVideoTracks().length}`);
+                log(`  - Audio tracks: ${localStream.getAudioTracks().length}`);
+                log(`  - Stream ID: ${localStream.id}`);
+                
+                localStream.getVideoTracks().forEach(track => {
+                    log(`  - Video track: ${track.kind}, enabled: ${track.enabled}, ready: ${track.readyState}`);
+                });
+                
+                localStream.getAudioTracks().forEach(track => {
+                    log(`  - Audio track: ${track.kind}, enabled: ${track.enabled}, ready: ${track.readyState}`);
+                });
+                
+                // Assign to local video
+                localVideo.srcObject = localStream;
+                log('📹 Local stream assigned to video element');
+                
+                // Also assign to remote video to simulate what should happen
+                remoteVideo.srcObject = localStream;
+                log('📹 Local stream also assigned to remote video (for testing)');
+                
+                localVideo.onloadedmetadata = () => {
+                    log(`📹 Local video metadata loaded: ${localVideo.videoWidth}x${localVideo.videoHeight}`);
+                };
+                
+                localVideo.oncanplay = () => {
+                    log('▶️ Local video can play');
+                };
+                
+                localVideo.onerror = (e) => {
+                    log('❌ Local video error: ' + e);
+                };
+                
+                remoteVideo.onloadedmetadata = () => {
+                    log(`📹 Remote video metadata loaded: ${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`);
+                };
+                
+                remoteVideo.oncanplay = () => {
+                    log('▶️ Remote video can play');
+                };
+                
+                remoteVideo.onerror = (e) => {
+                    log('❌ Remote video error: ' + e);
+                };
+                
+            } catch (error) {
+                log('❌ Error getting user media: ' + error.message);
+                if (error.name === 'NotAllowedError') {
+                    log('   Permission denied - please allow camera access');
+                } else if (error.name === 'NotFoundError') {
+                    log('   No camera found');
+                }
+            }
+        }
+        
+        function stopLocalVideo() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                    log(`🛑 Stopped ${track.kind} track`);
+                });
+                localVideo.srcObject = null;
+                remoteVideo.srcObject = null;
+                localStream = null;
+                log('✅ Local stream stopped and cleared');
+            }
+        }
+        
+        log('🚀 Video test page loaded');
+        log('💡 Click "Start Local Video" to test camera access');
+    </script>
+</body>
+</html>
