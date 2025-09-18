@@ -11,6 +11,9 @@ A modern, feature-rich web chat application with video calling, audio calling, v
 - Security alerts for failed login attempts (5 attempts = account lockout + email alert)
 - Account lockout after multiple failed attempts
 
+- <img width="1920" height="1080" alt="Screenshot (113)" src="https://github.com/user-attachments/assets/4f1e289c-291f-47a8-b8f9-d00897235b50" />
+
+
 ### 💬 Messaging
 - Real-time messaging with Socket.io
 - Message timestamps in IST (Indian Standard Time)
@@ -47,6 +50,9 @@ A modern, feature-rich web chat application with video calling, audio calling, v
 - User blocking
 - Profile management
 - Privacy settings
+
+- <img width="1920" height="1080" alt="Screenshot (112)" src="https://github.com/user-attachments/assets/37518e12-95fb-495d-b1aa-06de7b3f5d7c" />
+
 
 ## Tech Stack
 
